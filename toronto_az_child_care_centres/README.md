@@ -28,10 +28,7 @@ This is a Python program that scrapes [A - Z list of Licensed Child Care Centres
     - standardize website prefix
     - extract website from email if necessary, get rid of email provider to be consider as website *(e.g. gmail.com, hotmail.com, rogers.com)*
 
-
-**Step 4.** Remove the attribute 'link' as it is not in use anymore.
-
-**Step 5.** Convert result to DataFrame and export CSV.
+**Step 4.** Convert result to DataFrame and export CSV.
 
 <br/>
 
