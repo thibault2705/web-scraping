@@ -77,7 +77,7 @@ def main():
     programs = scrape_whole_page(url)
 
     df = pd.DataFrame(programs)
-    print(f'Columns: {df.columns}')
+    print(f'Columns: {list(df.columns)}')
     print(f'Shape: {df.shape}')
 
     df.to_csv('sp_programs.csv', index=False)
