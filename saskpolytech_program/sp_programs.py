@@ -9,29 +9,33 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 
-def scrape_program(driver):
+def scrape_programs(driver):
+    # find elements by class name 'az-info'
+    program_infos = driver.find_elements(By.CLASS_NAME, 'az-info')
 
-    # find elements by class name 'az-name'
-    programs = driver.find_elements(By.CLASS_NAME, 'az-name')
+    programs = []
 
-    scraped_data = []
+    # iterate over found elements
+    for info in program_infos:
+        name = info.find_elements(By.CLASS_NAME, 'az-name')[0]
+        link = name.find_element(By.TAG_NAME, 'a',)
+        location = info.find_elements(By.CLASS_NAME, 'az-locations')[0]
+        credential = info.find_elements(By.CLASS_NAME, 'az-credential')[0]
 
-    # iterate over found elements and print their text content
-    for program in programs:
-        program_item = program.find_element(By.TAG_NAME, 'a',)
-
-        data = {
-            'name': program_item.text,
-            'url': program_item.get_attribute('href'),
+        program = {
+            'name': name.text,
+            'link': link.get_attribute('href'),
+            'locations': location.text,
+            'credential': credential.text,
         }
 
         # append the data to the empty list
-        scraped_data.append(data)
+        programs.append(program)
 
     # return the scraped data
-    return scraped_data
+    return programs
 
-def scrape_all_page(url):
+def scrape_whole_page(url):
     # instantiate options for Chrome
     options = webdriver.ChromeOptions()
     # run the browser in headless mode
@@ -56,7 +60,7 @@ def scrape_all_page(url):
 
         if new_height == last_height:
             # extract data once all content has loaded
-            data.extend(scrape_program(driver))
+            data.extend(scrape_programs(driver))
             break
         last_height = new_height
 
@@ -66,15 +70,18 @@ def scrape_all_page(url):
     return data
 
 
-URL = 'https://saskpolytech.ca/programs-and-courses/browse-programs/a-z-listing.aspx'
-
-program_listings = []
-program_listings.extend(scrape_all_page(URL))
-
 import pandas as pd
-df = pd.DataFrame(program_listings)
-print(df)
 
-import sys
-sys.exit()
+def main():
+    url = 'https://saskpolytech.ca/programs-and-courses/browse-programs/a-z-listing.aspx'
+    programs = scrape_whole_page(url)
+
+    df = pd.DataFrame(programs)
+    print(f'Columns: {df.columns}')
+    print(f'Shape: {df.shape}')
+
+    df.to_csv('sp_programs.csv', index=False)
+
+if __name__ == '__main__':
+    main()
 
